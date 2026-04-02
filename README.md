@@ -368,7 +368,7 @@ Based on logistic regression coefficients (absolute value):
 - Each additional company worked increases attrition odds by ~45%
 - **Stock options** are highly protective — employees with any level churn significantly less
 - Salary and tenure are the two strongest protective factors overall
-
+https://d160f74e-f90a-48f8-a960-050ceb0d653b-00-3owee2mwhvson.worf.replit.dev/
 ---
 
 *Built by Sravani | Employee Attrition Risk Prediction System*
