@@ -1,15 +1,20 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Employee Attrition Risk Prediction API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: employees
+    description: Employee data operations
+  - name: predictions
+    description: Attrition risk predictions
+  - name: analytics
+    description: Analytics and feature importance
 paths:
   /healthz:
     get:
@@ -24,6 +29,155 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /employees:
+    get:
+      operationId: listEmployees
+      tags: [employees]
+      summary: List employees
+      description: Get paginated list of employees with attrition predictions
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: department
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: riskLevel
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Employee list with pagination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeListResponse"
+
+  /employees/{id}:
+    get:
+      operationId: getEmployee
+      tags: [employees]
+      summary: Get employee details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeDetail"
+        "404":
+          description: Not found
+
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Get attrition summary statistics
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
+  /analytics/feature-importance:
+    get:
+      operationId: getFeatureImportance
+      tags: [analytics]
+      summary: Get feature importance from the model
+      responses:
+        "200":
+          description: Feature importance list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeatureImportanceItem"
+
+  /analytics/department-breakdown:
+    get:
+      operationId: getDepartmentBreakdown
+      tags: [analytics]
+      summary: Attrition risk breakdown by department
+      responses:
+        "200":
+          description: Department breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepartmentBreakdown"
+
+  /analytics/risk-distribution:
+    get:
+      operationId: getRiskDistribution
+      tags: [analytics]
+      summary: Distribution of employees across risk levels
+      responses:
+        "200":
+          description: Risk distribution
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskDistributionItem"
+
+  /analytics/model-metrics:
+    get:
+      operationId: getModelMetrics
+      tags: [analytics]
+      summary: Model performance metrics (accuracy, F1, ROC-AUC)
+      responses:
+        "200":
+          description: Model metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelMetrics"
+
+  /predictions/run:
+    post:
+      operationId: runPrediction
+      tags: [predictions]
+      summary: Run attrition prediction for a single employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictionInput"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +188,344 @@ components:
       required:
         - status
 
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        employeeId:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        department:
+          type: string
+        jobRole:
+          type: string
+        yearsAtCompany:
+          type: number
+        monthlyIncome:
+          type: number
+        attritionRisk:
+          type: number
+        riskLevel:
+          type: string
+        attrited:
+          type: boolean
+        jobSatisfaction:
+          type: integer
+        workLifeBalance:
+          type: integer
+        overTime:
+          type: boolean
+      required:
+        - id
+        - employeeId
+        - name
+        - age
+        - department
+        - jobRole
+        - yearsAtCompany
+        - monthlyIncome
+        - attritionRisk
+        - riskLevel
+        - attrited
+        - jobSatisfaction
+        - workLifeBalance
+        - overTime
+
+    EmployeeDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        employeeId:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        department:
+          type: string
+        jobRole:
+          type: string
+        yearsAtCompany:
+          type: number
+        monthlyIncome:
+          type: number
+        attritionRisk:
+          type: number
+        riskLevel:
+          type: string
+        attrited:
+          type: boolean
+        jobSatisfaction:
+          type: integer
+        workLifeBalance:
+          type: integer
+        overTime:
+          type: boolean
+        education:
+          type: integer
+        distanceFromHome:
+          type: integer
+        numCompaniesWorked:
+          type: integer
+        totalWorkingYears:
+          type: number
+        trainingTimesLastYear:
+          type: integer
+        yearsInCurrentRole:
+          type: number
+        yearsSinceLastPromotion:
+          type: number
+        environmentSatisfaction:
+          type: integer
+        jobInvolvement:
+          type: integer
+        performanceRating:
+          type: integer
+        stockOptionLevel:
+          type: integer
+        maritalStatus:
+          type: string
+        gender:
+          type: string
+      required:
+        - id
+        - employeeId
+        - name
+        - age
+        - department
+        - jobRole
+        - yearsAtCompany
+        - monthlyIncome
+        - attritionRisk
+        - riskLevel
+        - attrited
+        - jobSatisfaction
+        - workLifeBalance
+        - overTime
+        - education
+        - distanceFromHome
+        - numCompaniesWorked
+        - totalWorkingYears
+        - trainingTimesLastYear
+        - yearsInCurrentRole
+        - yearsSinceLastPromotion
+        - environmentSatisfaction
+        - jobInvolvement
+        - performanceRating
+        - stockOptionLevel
+        - maritalStatus
+        - gender
+
+    EmployeeListResponse:
+      type: object
+      properties:
+        employees:
+          type: array
+          items:
+            $ref: "#/components/schemas/Employee"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - employees
+        - total
+        - page
+        - pageSize
+        - totalPages
+
+    AnalyticsSummary:
+      type: object
+      properties:
+        totalEmployees:
+          type: integer
+        attritionCount:
+          type: integer
+        attritionRate:
+          type: number
+        highRiskCount:
+          type: integer
+        mediumRiskCount:
+          type: integer
+        lowRiskCount:
+          type: integer
+        avgAttritionRisk:
+          type: number
+        avgMonthlyIncome:
+          type: number
+        avgYearsAtCompany:
+          type: number
+      required:
+        - totalEmployees
+        - attritionCount
+        - attritionRate
+        - highRiskCount
+        - mediumRiskCount
+        - lowRiskCount
+        - avgAttritionRisk
+        - avgMonthlyIncome
+        - avgYearsAtCompany
+
+    FeatureImportanceItem:
+      type: object
+      properties:
+        feature:
+          type: string
+        importance:
+          type: number
+        direction:
+          type: string
+      required:
+        - feature
+        - importance
+        - direction
+
+    DepartmentBreakdown:
+      type: object
+      properties:
+        department:
+          type: string
+        total:
+          type: integer
+        attrited:
+          type: integer
+        highRisk:
+          type: integer
+        attritionRate:
+          type: number
+        avgRisk:
+          type: number
+      required:
+        - department
+        - total
+        - attrited
+        - highRisk
+        - attritionRate
+        - avgRisk
+
+    RiskDistributionItem:
+      type: object
+      properties:
+        riskLevel:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+      required:
+        - riskLevel
+        - count
+        - percentage
+
+    ModelMetrics:
+      type: object
+      properties:
+        accuracy:
+          type: number
+        f1Score:
+          type: number
+        rocAuc:
+          type: number
+        precision:
+          type: number
+        recall:
+          type: number
+        cvMean:
+          type: number
+        cvStd:
+          type: number
+        trainSize:
+          type: integer
+        testSize:
+          type: integer
+      required:
+        - accuracy
+        - f1Score
+        - rocAuc
+        - precision
+        - recall
+        - cvMean
+        - cvStd
+        - trainSize
+        - testSize
+
+    PredictionInput:
+      type: object
+      properties:
+        age:
+          type: integer
+        monthlyIncome:
+          type: number
+        yearsAtCompany:
+          type: number
+        jobSatisfaction:
+          type: integer
+        workLifeBalance:
+          type: integer
+        overTime:
+          type: boolean
+        distanceFromHome:
+          type: integer
+        numCompaniesWorked:
+          type: integer
+        totalWorkingYears:
+          type: number
+        yearsInCurrentRole:
+          type: number
+        yearsSinceLastPromotion:
+          type: number
+        environmentSatisfaction:
+          type: integer
+        jobInvolvement:
+          type: integer
+        performanceRating:
+          type: integer
+        stockOptionLevel:
+          type: integer
+        trainingTimesLastYear:
+          type: integer
+      required:
+        - age
+        - monthlyIncome
+        - yearsAtCompany
+        - jobSatisfaction
+        - workLifeBalance
+        - overTime
+        - distanceFromHome
+        - numCompaniesWorked
+        - totalWorkingYears
+        - yearsInCurrentRole
+        - yearsSinceLastPromotion
+        - environmentSatisfaction
+        - jobInvolvement
+        - performanceRating
+        - stockOptionLevel
+        - trainingTimesLastYear
+
+    PredictionResult:
+      type: object
+      properties:
+        attritionRisk:
+          type: number
+        riskLevel:
+          type: string
+        confidence:
+          type: number
+        topFactors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureImportanceItem"
+      required:
+        - attritionRisk
+        - riskLevel
+        - confidence
+        - topFactors
